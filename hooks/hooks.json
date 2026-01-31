@@ -1,0 +1,28 @@
+{
+  "description": "Automatic jj snapshot hooks for Claude Code",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/jj-context.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Stop",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/jj-snapshot.sh",
+            "timeout": 10,
+            "statusMessage": "Creating jj snapshot..."
+          }
+        ]
+      }
+    ]
+  }
+}

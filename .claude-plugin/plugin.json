@@ -1,0 +1,12 @@
+{
+  "name": "jj",
+  "version": "0.1.0",
+  "description": "Jujutsu (jj) version control integration for Claude Code. Provides automatic snapshots, setup assistance, and comprehensive usage guidance.",
+  "author": {
+    "name": "gyu-don"
+  },
+  "homepage": "https://github.com/gyu-don/claude-jj-plugin",
+  "repository": "https://github.com/gyu-don/claude-jj-plugin",
+  "license": "MIT",
+  "keywords": ["jj", "jujutsu", "version-control", "git", "vcs"]
+}
