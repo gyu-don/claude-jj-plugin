@@ -28,9 +28,23 @@ Then install the plugin:
 
 ### From Local Directory
 
+Clone the repository and add it as a local marketplace:
+
 ```bash
 git clone https://github.com/gyu-don/claude-jj-plugin.git
-/plugin add ./claude-jj-plugin
+```
+
+```
+/plugin marketplace add ./claude-jj-plugin
+/plugin install jj@claude-jj-plugin
+```
+
+### For Development
+
+Use `--plugin-dir` to test plugins without installing:
+
+```bash
+claude --plugin-dir ./claude-jj-plugin
 ```
 
 ## What's Included
