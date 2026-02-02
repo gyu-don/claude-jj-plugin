@@ -10,53 +10,53 @@ jj is a Git-compatible version control system. Key advantages:
 - **Auto-snapshots**: Working copy changes are automatically tracked
 - **No staging area**: Simpler than `git add` + `git commit`
 
-## Critical Rules (MUST FOLLOW)
+## Critical Rules
 
-### 1. Always Use `-m` Flag
+### Always Use `-m` Flag (except `jj new`)
+Commands that set messages open an editor without `-m` and fail:
 ```bash
-# ✅ CORRECT - Non-interactive
-jj desc -m "message"
-jj squash -m "message"
-jj new -m "message"
-
-# ❌ WRONG - Opens editor, fails in non-interactive mode
-jj desc
-jj squash
+jj desc -m "message"        # ✅
+jj squash -m "message"      # ✅
+jj desc                     # ❌ Opens editor, fails
 ```
 
-### 2. Set Up .gitignore BEFORE Creating Files
+`jj split` and `jj commit` also need file paths to avoid interactive mode:
 ```bash
-# ✅ CORRECT order
+jj split -m "msg" file.txt  # ✅
+jj commit -m "msg" file.txt # ✅
+jj split -m "msg"           # ❌ Interactive file selection
+```
+
+Exception: `jj new` works without `-m` (creates empty change):
+```bash
+jj new -m "Start feature"  # ✅ Recommended
+jj new                     # ✅ OK, describe later
+```
+
+### Use `jj bookmark`, NOT `jj branch`
+`jj branch` is deprecated:
+```bash
+jj bookmark create feature-x  # ✅
+jj branch create feature-x    # ❌ Deprecated
+```
+
+### ⚠️ SECURITY: .gitignore BEFORE Creating Files
+**jj auto-tracks ALL files immediately.** Secrets created before .gitignore are tracked and may be pushed:
+```bash
+# ✅ SAFE: gitignore first
 echo "*.env" >> .gitignore
-echo "secret" > .env  # Will be ignored
+echo "secret" > .env
 
-# ❌ DANGEROUS - File gets tracked automatically!
-echo "secret" > .env  # Gets tracked by auto-snapshot
-echo "*.env" >> .gitignore  # Too late - already tracked!
+# ❌ DANGER: Secret is already tracked!
+echo "secret" > .env
+echo "*.env" >> .gitignore  # Too late!
 ```
-
-**Fix if already tracked**:
+**If already tracked**:
 ```bash
-echo "secret.txt" >> .gitignore
-jj file untrack secret.txt
+echo ".env" >> .gitignore   # First! Otherwise re-tracked
+jj file untrack .env
 ```
-
-### 3. Use `jj bookmark`, NOT `jj branch`
-```bash
-# ✅ CORRECT
-jj bookmark create feature-x
-jj bookmark list
-
-# ❌ WRONG - deprecated!
-jj branch create feature-x
-```
-
-### 4. Use `jj undo` Liberally
-```bash
-# If anything goes wrong:
-jj undo
-# Try different approach
-```
+⚠️ Note: Past snapshots still contain the file.
 
 ## Essential Commands
 
@@ -71,9 +71,20 @@ jj file search "pattern" # Search file contents (like git grep)
 
 ### Working with Changes
 ```bash
-jj new -m "Start new work"       # Create new change
-jj desc -m "Update message"      # Set commit message
-jj desc -r @- -m "Fix parent"    # Update parent's message
+jj new -m "Start new work"        # Create new change
+jj desc -m "Update message"       # Set commit message
+jj desc -r @- -m "Fix parent"     # Update parent's message
+```
+
+### Splitting Changes
+Both require `-m` and file paths to avoid interactive mode:
+```bash
+# jj commit: only works on @ (working copy), doesn't move bookmarks
+jj commit -m "Extract" file.txt
+
+# jj split: works on any revision with -r, moves bookmarks to child
+jj split -m "Extract" file.txt
+jj split -r @- -m "Extract from parent" file.txt
 ```
 
 ### History Manipulation
@@ -119,7 +130,6 @@ jj git push --bookmark <name>    # Push specific bookmark
 ```bash
 jj restore <file>                # Restore file to parent's version
 jj restore --from @-- <file>     # Restore from specific revision
-jj split                         # Interactively split current commit
 jj absorb                        # Auto-absorb changes into ancestors
 jj abandon @                     # Discard current commit
 ```
@@ -152,28 +162,24 @@ jj log -r 'author(substring:"john")'
 ## Common Errors & Solutions
 
 ### Error: Editor Opens
-**Cause**: Missing `-m` flag
-**Solution**: Always use `-m "message"`
+**Cause**: Missing `-m` flag on `jj desc`, `jj squash`, `jj split`, etc.
+**Solution**: Use `-m "message"` (except `jj new`)
 
 ### Error: 403 on Push
 **Cause**: Wrong bookmark name or no permission
 **Solution**: Check `jj bookmark list` for naming pattern
 
-### Issue: Secret File Tracked
-**Cause**: File created before .gitignore
-**Solution**:
-```bash
-echo "secret.txt" >> .gitignore
-jj file untrack secret.txt
-```
+### Secret File Tracked
+See Critical Rules above. Add to .gitignore first, then `jj file untrack <file>`.
 
 ## Common Workflows
 
 ### Starting Work
 ```bash
 jj st                           # Check status
+jj new -m "Implement feature"   # Create new change BEFORE starting work
 # Make changes to files
-jj new -m "Implement feature"   # Create checkpoint
+jj new -m "Add tests"           # Create next change when ready to move on
 ```
 
 ### Cleaning History
@@ -203,10 +209,19 @@ When working with both jj and Git:
 - Git shows jj's working copy as "detached HEAD" (normal)
 - Don't use `git commit` or `git checkout` (causes state mismatch)
 
-## Best Practices for AI Agents
+## Best Practices
 
-1. **Always specify messages with `-m`**
-2. **Set up .gitignore before creating files**
-3. **Use `jj st` frequently** - Verify no secrets are tracked
-4. **Leverage `jj undo`** - Experiment safely
-5. **Check `jj op log` when debugging**
+### Use `jj new` Frequently
+Create commits at `git commit` granularity or finer. Unlike git, `jj new` is cheap—use it:
+- Before starting a new logical unit of work
+- After completing a feature or fix
+- When switching context
+
+### Use `jj undo` Liberally
+If anything goes wrong, `jj undo` reverses the last operation. Experiment freely.
+
+### Verify with `jj st`
+Check status frequently to ensure no secrets are tracked.
+
+### Debug with `jj op log`
+When something goes wrong, `jj op log --limit 5` shows recent operations.
