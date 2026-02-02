@@ -17,7 +17,7 @@
 First, add the marketplace:
 
 ```
-/plugin marketplace add gyu-don/claude-jj-plugin
+/plugin marketplace add gyu-don/jj-agent-plugin
 ```
 
 Then install the plugin:
@@ -31,12 +31,12 @@ Then install the plugin:
 Clone the repository and add it as a local marketplace:
 
 ```bash
-git clone https://github.com/gyu-don/claude-jj-plugin.git
+git clone https://github.com/gyu-don/jj-agent-plugin.git
 ```
 
 ```
-/plugin marketplace add ./claude-jj-plugin
-/plugin install jj@claude-jj-plugin
+/plugin marketplace add ./jj-agent-plugin
+/plugin install jj@jj-agent-plugin
 ```
 
 ### For Development
@@ -44,13 +44,13 @@ git clone https://github.com/gyu-don/claude-jj-plugin.git
 Use `--plugin-dir` to test plugins without installing:
 
 ```bash
-claude --plugin-dir ./claude-jj-plugin
+claude --plugin-dir ./jj-agent-plugin
 ```
 
 ## What's Included
 
 ```
-claude-jj-plugin/
+jj-agent-plugin/
 ├── .claude-plugin/
 │   └── plugin.json          # Plugin manifest
 ├── hooks/

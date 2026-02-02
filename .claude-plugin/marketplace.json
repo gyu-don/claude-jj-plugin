@@ -16,8 +16,8 @@
       "author": {
         "name": "gyu-don"
       },
-      "homepage": "https://github.com/gyu-don/claude-jj-plugin",
-      "repository": "https://github.com/gyu-don/claude-jj-plugin",
+      "homepage": "https://github.com/gyu-don/jj-agent-plugin",
+      "repository": "https://github.com/gyu-don/jj-agent-plugin",
       "license": "MIT",
       "keywords": ["jj", "jujutsu", "version-control", "git", "vcs"]
     }
