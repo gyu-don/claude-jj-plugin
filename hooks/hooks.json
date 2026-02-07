@@ -3,17 +3,23 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup|clear|compact",
         "hooks": [
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/jj-context.sh"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/jj-snapshot.sh",
+            "timeout": 10,
+            "statusMessage": "Creating jj snapshot..."
           }
         ]
       }
     ],
-    "PostToolUse": [
+    "Stop": [
       {
-        "matcher": "Stop",
         "hooks": [
           {
             "type": "command",
@@ -23,6 +29,5 @@
           }
         ]
       }
-    ]
   }
 }
